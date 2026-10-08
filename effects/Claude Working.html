@@ -1,0 +1,18 @@
+<head>
+  <title>Claude Working</title>
+  <meta description="Claude Code is working: pulsing orange"/>
+  <meta publisher="claude-rgb"/>
+</head>
+<body style="margin:0"><canvas id="c" width="320" height="200"></canvas></body>
+<script>
+const COLOR = [255, 60, 0];
+const ctx = document.getElementById('c').getContext('2d');
+function frame() {
+  const t = performance.now() / 1000;
+  const a = 0.25 + 0.75 * (0.5 + 0.5 * Math.sin(t * 3));
+  ctx.fillStyle = `rgb(${COLOR.map(v => Math.round(v * a)).join(',')})`;
+  ctx.fillRect(0, 0, 320, 200);
+  requestAnimationFrame(frame);
+}
+frame();
+</script>
