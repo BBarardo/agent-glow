@@ -1,0 +1,13 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "agent-glow",
+  "description": "Lighting that follows Claude Code's state.",
+  "owner": { "name": "BBarardo" },
+  "plugins": [
+    {
+      "name": "agent-glow",
+      "source": "./",
+      "description": "RGB lighting that follows Claude Code's state (SignalRGB, Windows)."
+    }
+  ]
+}

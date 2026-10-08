@@ -1,6 +1,7 @@
-# claude-rgb: SignalRGB lighting that follows Claude Code's state.
-# usage: rgb.ps1 install | uninstall | start | work | idle   (timer is internal)
-$d = $PSScriptRoot
+# agent-glow: SignalRGB lighting that follows Claude Code's state.
+# usage (called by hooks/hooks.json): rgb.ps1 start | work | idle   (timer is internal)
+$d = if ($env:CLAUDE_PLUGIN_DATA) { $env:CLAUDE_PLUGIN_DATA } else { "$env:USERPROFILE\.claude\agent-glow" }
+New-Item -ItemType Directory -Force $d | Out-Null
 $state = "$d\normal.txt"; $pidf = "$d\timer.pid"
 $IdleMinutes = 20
 
@@ -13,31 +14,14 @@ function Timer {
     $o = Get-CimInstance Win32_Process -Filter "ProcessId=$(Get-Content $pidf)"
     if ($o.CommandLine -match 'rgb\.ps1.*timer') { Stop-Process -Id $o.ProcessId -Force }  # PID may have been reused
   }
-  $p = Start-Process powershell -WindowStyle Hidden -PassThru -ArgumentList '-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', $PSCommandPath, 'timer'
+  $p = Start-Process powershell -WindowStyle Hidden -PassThru -ArgumentList '-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', "`"$PSCommandPath`"", 'timer'
   Set-Content $pidf $p.Id
 }
 
-function Hooks($add) {
-  $f = "$env:USERPROFILE\.claude\settings.json"
-  $j = if (Test-Path $f) { Get-Content $f -Raw | ConvertFrom-Json } else { [pscustomobject]@{} }
-  if (-not $j.hooks) { $j | Add-Member hooks ([pscustomobject]@{}) -Force }
-  $ps = "powershell -NoProfile -ExecutionPolicy Bypass -File `"$PSCommandPath`""
-  # SessionEnd: Claude exits before PowerShell would start, so use a bare explorer.exe call (hooks run in bash)
-  $cmds = @{ SessionStart = "$ps start"; UserPromptSubmit = "$ps work"; Stop = "$ps idle"
-             SessionEnd = "explorer.exe `"`$(cat '$($d -replace '\\','/')/normal.url')`"" }
-  foreach ($e in $cmds.Keys) {
-    $keep = @($j.hooks.$e | Where-Object { $_ -and -not ($_.hooks.command -match 'claude-rgb|rgb\.ps1|normal\.url') })
-    if ($add) { $keep += @{ hooks = @(@{ type = 'command'; command = $cmds[$e] }) } }
-    $j.hooks | Add-Member $e $keep -Force
-  }
-  $j | ConvertTo-Json -Depth 20 | Set-Content $f
-}
-
 switch ($args[0]) {
-  'install'   { Copy-Item "$d\effects\*.html" "$env:USERPROFILE\Documents\WhirlwindFX\Effects\" -Force; Hooks $true
-                'Installed. Restart SignalRGB and start a new Claude Code session.' }
-  'uninstall' { Hooks $false; 'Hooks removed.' }
   'start' {
+    # keep SignalRGB's copy of the effects in sync with the plugin (new effects need a SignalRGB restart)
+    Copy-Item "$PSScriptRoot\effects\*.html" "$env:USERPROFILE\Documents\WhirlwindFX\Effects\" -Force -EA 0
     $cur = (Get-ItemProperty HKCU:\Software\WhirlwindFX\SignalRgb\effects\selected -EA 0).name
     if ($cur -and $cur -notlike 'Claude *') {
       Set-Content $state $cur

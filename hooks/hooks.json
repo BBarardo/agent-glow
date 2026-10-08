@@ -1,0 +1,9 @@
+{
+  "description": "SignalRGB lighting that follows Claude Code's state",
+  "hooks": {
+    "SessionStart": [{ "hooks": [{ "type": "command", "command": "powershell -NoProfile -ExecutionPolicy Bypass -File \"${CLAUDE_PLUGIN_ROOT}/rgb.ps1\" start" }] }],
+    "UserPromptSubmit": [{ "hooks": [{ "type": "command", "command": "powershell -NoProfile -ExecutionPolicy Bypass -File \"${CLAUDE_PLUGIN_ROOT}/rgb.ps1\" work" }] }],
+    "Stop": [{ "hooks": [{ "type": "command", "command": "powershell -NoProfile -ExecutionPolicy Bypass -File \"${CLAUDE_PLUGIN_ROOT}/rgb.ps1\" idle" }] }],
+    "SessionEnd": [{ "hooks": [{ "type": "command", "command": "explorer.exe \"$(cat \"${CLAUDE_PLUGIN_DATA:-$HOME/.claude/agent-glow}/normal.url\")\"" }] }]
+  }
+}

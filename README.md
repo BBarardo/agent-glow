@@ -1,4 +1,4 @@
-# claude-rgb
+# agent-glow
 
 Your PC's RGB lighting shows what Claude Code is doing. It glows orange while a session is open, pulses while Claude works, and returns to your usual SignalRGB effect when you exit or leave it idle.
 
@@ -24,20 +24,19 @@ When a session starts, the script saves whatever effect you had active. That is 
 
 ## Install
 
-```powershell
-git clone https://github.com/BBarardo/claude-rgb.git
-cd claude-rgb
-powershell -ExecutionPolicy Bypass -File .\rgb.ps1 install
+agent-glow is a Claude Code plugin. Inside Claude Code, run:
+
+```
+/plugin marketplace add BBarardo/agent-glow
+/plugin install agent-glow@agent-glow
 ```
 
-`install` does two things:
+Then:
 
-1. It copies the effects to `Documents\WhirlwindFX\Effects`.
-2. It adds four hooks to `~/.claude/settings.json`. Your existing hooks are kept.
+1. Open a new Claude Code session. On its first start, the plugin copies its effects to `Documents\WhirlwindFX\Effects`.
+2. Restart SignalRGB once so it picks up the new effects.
 
-After that, restart SignalRGB so it picks up the new effects, then open a new Claude Code session.
-
-To remove the hooks, run `.\rgb.ps1 uninstall`.
+To turn it off, disable or uninstall it from `/plugin`.
 
 ## How it works
 
@@ -48,7 +47,7 @@ To remove the hooks, run `.\rgb.ps1 uninstall`.
 
 ## Customize
 
-- **Color:** change `COLOR` in `effects/*.html`, then run `install` again and restart SignalRGB.
+- **Color:** change `COLOR` in `effects/*.html`, then start a new session and restart SignalRGB.
 - **Idle timeout:** change `$IdleMinutes` in `rgb.ps1`.
 - **Effects:** each one is a plain 320×200 canvas page. See [SignalRGB's effect docs](https://docs.signalrgb.com).
 

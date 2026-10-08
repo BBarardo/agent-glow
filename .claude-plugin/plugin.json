@@ -1,0 +1,8 @@
+{
+  "name": "agent-glow",
+  "version": "1.0.0",
+  "description": "RGB lighting that follows Claude Code's state: orange while open, pulsing while working, back to your SignalRGB effect when idle or on exit.",
+  "author": { "name": "BBarardo" },
+  "homepage": "https://github.com/BBarardo/agent-glow",
+  "license": "MIT"
+}
